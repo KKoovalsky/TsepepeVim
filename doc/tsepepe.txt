@@ -1,0 +1,23 @@
+*tsepepe.txt*	Tiny plugin for humble C++ refactoring.
+
+Allows to generate function definitions only, for now, but more features
+are going to be implemented. ;)
+
+Requires compilation database (compile_commands.json) to be held under the root 
+directory of the project.
+
+Commands:
+:TsepepeGenDef
+	Generates function definition in a corresponding source file from
+        a function declared at line under cursor. It is assumend that the name
+        of the corresponding source file has format: 
+            <stem of the currently active file (a header file is supposed>.cpp
+        The corresponding *.cpp file is tried to be found recursively,
+        starting from the project root directory, which is assumed to be where
+        the compilation database is located.
+        After the command is executed, the corresponding *.cpp file is
+        activated in a buffer.
+        The generated definition will be appended at the end of the file.
+
+						*tsepepe-settings*
+This plugin doesn't have any settings.
