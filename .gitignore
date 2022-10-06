@@ -1,0 +1,4 @@
+# Used to build the core Tsepepe
+build/
+# Where the Tsepepe build artifacts will be installed
+output/
