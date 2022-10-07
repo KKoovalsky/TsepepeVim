@@ -111,7 +111,7 @@ if !exists("*s:AppendToWindow")
         execute('tab drop ' .. file)
         
         # Put the cursor at the end of file.
-        execute('normal G')
+        execute('normal! G')
     
         # Put the text under the cursor.
         execute("normal! a\n\n" .. text .. "\n{\n}\<ESC>")
