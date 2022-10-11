@@ -15,14 +15,39 @@ if !exists(":TsepepeGenDef")
     command -buffer -nargs=0 TsepepeGenDef :call GenerateFunctionDefinitionInProperCppFile()
 endif
 
-if !exists("g:tsepepe_programs_dir")
+if !has("python3")
+    throw "ERROR: no python3 support! Enable +python3 feature to allow this plugin to work."
+endif
+
+if !exists("g:tsepepe_plugin_dir")
     # This plugin dir is computed from the currently sourced file (<sfile>),
     # its full path (:p), but this file is located under 
     #    <plugin dir>/ftplugin/cpp/tsepepe.vim
     # thus we need to take the third parent dir (:h x 3)
-    var this_plugin_dir = expand('<sfile>:p:h:h:h')
+    g:tsepepe_plugin_dir = expand('<sfile>:p:h:h:h')
+endif
+
+if !exists("g:tsepepe_python3_utils_loaded")
+
+    # Let's load the python3 helpers for this plugin globally, once for all.
+
+    py3 << trim EOF
+    import os
+    import sys
+    import vim
+
+    plugin_path = vim.eval("g:tsepepe_plugin_dir")
+    module_path = os.path.join(plugin_path, 'python3')
+    sys.path.append(module_path)
+    from pytsepepevim import comp_db_dir_getter
+    EOF
+
+    g:tsepepe_python3_utils_loaded = true
+endif
+
+if !exists("g:tsepepe_programs_dir")
     # Assume Tsepepe is build inside the plugin dir.
-    g:tsepepe_programs_dir = this_plugin_dir .. '/output/bin'
+    g:tsepepe_programs_dir = g:tsepepe_plugin_dir .. '/output/bin'
 endif
 
 if !exists("*s:GenerateFunctionDefinitionInProperCppFile")
@@ -37,7 +62,7 @@ if !exists("*GenerateFunctionDefinition")
     # Generates function definition from a declaration found at line, where
     # the cursor is currently located.
     def GenerateFunctionDefinition(): string
-        var dir_with_compile_db = getcwd()
+        var dir_with_compile_db = FindCompilationDatabaseDirectory()
         var current_file_abs_path = expand('%:p')
         var current_active_line = line('.')
         var generator = g:tsepepe_programs_dir
@@ -115,5 +140,16 @@ if !exists("*s:AppendToWindow")
     
         # Put the text under the cursor.
         execute("normal! a\n\n" .. text .. "\n{\n}\<ESC>")
+    enddef
+endif
+
+if !exists("*FindCompilationDatabaseDirectory")
+    def FindCompilationDatabaseDirectory(): string
+        var project_root = getcwd()
+        var current_file_abs_path = expand('%:p')
+        var py3code = 'comp_db_dir_getter.get_compile_db_dir('
+            .. '"' .. project_root .. '",'
+            .. '"' .. current_file_abs_path .. '")'
+        return py3eval(py3code)
     enddef
 endif
