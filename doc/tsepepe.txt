@@ -1,23 +1,94 @@
-*tsepepe.txt*	Tiny plugin for humble C++ refactoring.
+*tsepepe.txt*             A humble plugin for C++ refactoring.
+
+==============================================================================
+Description
 
 Allows to generate function definitions only, for now, but more features
 are going to be implemented. ;)
 
-Requires compilation database (compile_commands.json) to be held under the root 
-directory of the project.
+Requires compilation database (compile_commands.json) to be held under the 
+root directory of the project.
 
-Commands:
-:TsepepeGenDef
-	Generates function definition in a corresponding source file from
-        a function declared at line under cursor. It is assumend that the name
-        of the corresponding source file has format: 
-            <stem of the currently active file (a header file is supposed>.cpp
-        The corresponding *.cpp file is tried to be found recursively,
-        starting from the project root directory, which is assumed to be where
-        the compilation database is located.
-        After the command is executed, the corresponding *.cpp file is
-        activated in a buffer.
-        The generated definition will be appended at the end of the file.
+==============================================================================
+Commands                                                      *tsepepe-commands*
 
-						*tsepepe-settings*
-This plugin doesn't have any settings.
+                                                               *:TsepepeGenDef*
+:TsepepeGenDef          Generates function definition in a corresponding source
+                        file, from a function declared at line under cursor.
+
+                        Firstly, decides where to put the definition. In case
+                        the current file is a source file, then the definition
+                        will be appended to the current file. If it is a header
+                        file, then a paired C++ file is tried to be found. By a
+                        paired C++ file, a file with the same stem, but 
+                        different extension is meant. For example, for 'ff.hpp'
+                        a paired C++ file name is 'ff.cpp', 'ff.cxx' or 'ff.cc'.
+                        For 'ff.cpp' a paired C++ file name might be: 'ff.hpp',
+                        'ff.h', 'ff.hxx' or 'ff.hh'.
+                        
+                        When a paired C++ file is found in the same directory,
+                        where the current active file is located, then it takes
+                        precedence. Otherwise, the paired C++ file is tried
+                        to be found under the project root directory. Project
+                        root directory is the directory where vim was run from.
+                        Note, that if multiple paired files are found, then
+                        the user is prompted to choose the proper file.
+                        
+                        After the paired C++ file is resolved the function
+                        definition is generated. To generate the function 
+                        definition it is mandatory to have the compilation 
+                        database at hand. The plugin expects it to be located 
+                        under the project root directory. In case you can't have 
+                        it under the project root directory, or you use multiple 
+                        compilation databases, see |tsepepe-project-config|.
+
+                        Finally, the generated function definition is appended
+                        to the paired C++ file. In case the file is already
+                        open in a vim window, then the window is reused. 
+                        Otherwise, a new window is open.
+
+==============================================================================
+Per-project configuration                               *tsepepe-project-config*
+
+In case the 'compile_commands.json' cannot be held under the project root 
+directory,  the '.tsepepe.yml' comes handy. You can specify file patterns
+which are mapped to the compilation database directories. An example: >
+    compile_db:
+        - build_host/:
+            - Application/Source/logic/.*
+            - tests/host/.*
+        - build_android/:
+            - extras/android_tools/.*
+        - build_device/:
+            - .*
+
+All the paths are calculated from the project root directory (the path where
+the '.tsepepe.yml' is located).
+
+The above example will map, e.g.:
+    - Application/Source/logic/dumper.cpp -> build_host/
+    - extras/android_tools/data_acquisitor/visitor.hpp -> build_android/
+    - some/other/dir/yolo.cpp -> build_device/
+
+The directories 'build_host/', 'build_android/', 'build_device/' must all 
+contain compilation databases ('compile_commands.json' file).
+
+The patterns in the second level lists are matched with ECMAScript regex.
+
+The patterns are evaluated from the top to the bottom, thus it is recommended,
+to keep the default match: '.*' as the last entry in the YML file.
+
+To sum up, the '.tsepepe.yml' format is: >
+    compile_db:
+        - [directory with compilation database A]:
+            - [matching ECMAScript regex pattern 1]
+            - [matching ECMAScript regex pattern 2]
+            - ...
+        - [directory with compilation database B]:
+            - [matching ECMAScript regex pattern 3]
+            - [matching ECMAScript regex pattern 4]
+        - ...
+        - [directory with compilation database Z, a default match]:
+            - .*
+<
+vim:tw=78:ts=8:ft=help:norl:
