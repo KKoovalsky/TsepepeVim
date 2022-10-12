@@ -9,8 +9,8 @@ are going to be implemented. ;)
 Requires compilation database (compile_commands.json) to be held under the 
 root directory of the project.
 
-1. Commands                             |tsepepe-commands|
-2. Per-project configuration            |tsepepe-project-config|
+    1. Commands                             |tsepepe-commands|
+    2. Per-project configuration            |tsepepe-project-config|
 
 ==============================================================================
 1. Commands                                                  *tsepepe-commands*
