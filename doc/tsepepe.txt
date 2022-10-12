@@ -9,8 +9,11 @@ are going to be implemented. ;)
 Requires compilation database (compile_commands.json) to be held under the 
 root directory of the project.
 
+1. Commands                             |tsepepe-commands|
+2. Per-project configuration            |tsepepe-project-config|
+
 ==============================================================================
-Commands                                                      *tsepepe-commands*
+1. Commands                                                  *tsepepe-commands*
 
                                                                *:TsepepeGenDef*
 :TsepepeGenDef          Generates function definition in a corresponding source
@@ -48,7 +51,7 @@ Commands                                                      *tsepepe-commands*
                         Otherwise, a new window is open.
 
 ==============================================================================
-Per-project configuration                               *tsepepe-project-config*
+2. Per-project configuration                          *tsepepe-project-config*
 
 In case the 'compile_commands.json' cannot be held under the project root 
 directory,  the '.tsepepe.yml' comes handy. You can specify file patterns
@@ -61,6 +64,7 @@ which are mapped to the compilation database directories. An example: >
             - extras/android_tools/.*
         - build_device/:
             - .*
+<
 
 All the paths are calculated from the project root directory (the path where
 the '.tsepepe.yml' is located).
@@ -91,4 +95,5 @@ To sum up, the '.tsepepe.yml' format is: >
         - [directory with compilation database Z, a default match]:
             - .*
 <
+
 vim:tw=78:ts=8:ft=help:norl:
