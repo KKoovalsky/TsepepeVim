@@ -5,7 +5,10 @@ import subprocess
 
 def build():
     print("Generating build files ...")
-    run("cmake -S external/Tsepepe -B build -DCMAKE_INSTALL_PREFIX=output/")
+    run(
+        "cmake -S external/Tsepepe -B build -DCMAKE_INSTALL_PREFIX=output/"
+        " -DCMAKE_BUILD_TYPE=Release"
+    )
     print("Building ...")
     run("cmake --build build/")
     print("Installing ...")
