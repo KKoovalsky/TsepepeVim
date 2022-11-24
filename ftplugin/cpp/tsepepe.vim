@@ -15,6 +15,10 @@ if !exists(":TsepepeGenDef")
     command -buffer -nargs=0 TsepepeGenDef :call GenerateFunctionDefinitionInProperCppFile()
 endif
 
+if !exists(":TsepepeImplIface")
+    command -buffer -nargs=1 TsepepeImplIface :call ImplementInterface(<f-args>)
+endif
+
 if !has("python3")
     throw "ERROR: no python3 support! Enable +python3 feature to allow this plugin to work."
 endif
@@ -55,6 +59,16 @@ if !exists("*s:GenerateFunctionDefinitionInProperCppFile")
         var definition_file = FindDefinitionFile()
         var definition = GenerateFunctionDefinition()
         AppendToWindow(definition_file, definition)
+    enddef
+endif
+
+if !exists("*s:ImplementInterface")
+    # Extends the class under cursor by implementing the interface with the 
+    # specified name.
+    def ImplementInterface(interface_name: string)
+        var new_file_content = GetFileContentAfterImplementingInterface(
+            interface_name)
+        ReplaceActiveBufferContent(new_file_content)
     enddef
 endif
 
@@ -151,5 +165,40 @@ if !exists("*FindCompilationDatabaseDirectory")
             .. '"' .. project_root .. '",'
             .. '"' .. current_file_abs_path .. '")'
         return py3eval(py3code)
+    enddef
+endif
+
+if !exists("*GetFileContentAfterImplementingInterface")
+    def GetFileContentAfterImplementingInterface(interface_name: string): string
+        var dir_with_compile_db = FindCompilationDatabaseDirectory()
+        var project_root = getcwd()
+        var current_file_abs_path = expand('%:p')
+        var current_buffer_content = join(getline(1, '$'), "\n")
+        var active_line = line('.')
+
+        var implementor_maker = g:tsepepe_programs_dir 
+            .. '/tsepepe_implementor_maker'
+        var cmd = implementor_maker .. ' '
+            .. dir_with_compile_db .. ' '
+            .. project_root .. ' '
+            .. current_file_abs_path .. ' '
+            .. shellescape(current_buffer_content) .. ' '
+            .. interface_name .. ' '
+            .. active_line
+
+        var result = system(cmd)
+        if v:shell_error != 0
+            throw result
+        endif
+
+        return result
+    enddef
+endif
+
+
+if !exists("*ReplaceActiveBufferContent")
+    def ReplaceActiveBufferContent(new_buffer_content: string)
+        deletebufline('.', 1, '$')
+        setline(1, split(new_buffer_content, '\n'))
     enddef
 endif
