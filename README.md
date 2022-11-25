@@ -23,6 +23,13 @@ Knows what to skip and what to keep.
 
 ![Tsepepe Function definition generator presentation](./doc/assets/tsepepe_gen_def_presentation.gif)
 
+### Implement interface
+
+- Finds the interface (abstract class) with the specifed name within the project.
+- Adds an include statement, if not yet present, extends the base-clause with the qualified name of the interface,
+and adds `override` declarations of the pure virtual methods.
+
+![Tsepepe Implement interface presentation](./doc/assets/tsepepe_impl_iface_presentation.gif)
 
 ## Requirements
 
