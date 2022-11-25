@@ -81,6 +81,19 @@ root directory of the project.
         method is found. In case there is no "public" section exists, such a
         section will be added.
 
+-------------------------------------------------------------------------------
+:TsepepeGoToCorrespondingFile                   *:TsepepeGoToCorrespondingFile*
+
+    Switches to the window with the corresponding C++ file, which is the C++
+    file that has the same stem (filename without the extension). If the file is
+    already open in another window, then the window will be activated.
+    Otherwise, it will be open anew.
+
+    If there are multiple files with the same stem, then the paired file in
+    the same directory will be chosen. In case no paired file is found in the 
+    same directory, and multiple paired files are found across the project, then 
+    the user will be prompted to choose one.
+
 ==============================================================================
 2. Per-project configuration                          *tsepepe-project-config*
 
