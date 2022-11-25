@@ -4,6 +4,7 @@ This is a tiny C++ refactoring plugin which currently supports:
 
 * function definition generation from a function declaration,
 * implementing an interface (extending a class with an abstract class)
+* switching to the corresponding (paired) C++ file, with the same stem
 
 This plugin uses [Tsepepe](https://github.com/KKoovalsky/Tsepepe) toolset, which must be compiled along with the
 bundled plugin to properly work. This is explained later in the [Installing section](#installing).
@@ -30,6 +31,10 @@ Knows what to skip and what to keep.
 and adds `override` declarations of the pure virtual methods.
 
 ![Tsepepe Implement interface presentation](./doc/assets/tsepepe_impl_iface_presentation.gif)
+
+### Go to corresponding file
+
+This feature is similar to the clangd's "Switch between source/header".
 
 ## Requirements
 
