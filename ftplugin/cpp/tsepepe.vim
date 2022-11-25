@@ -19,6 +19,10 @@ if !exists(":TsepepeImplIface")
     command -buffer -nargs=1 TsepepeImplIface :call ImplementInterface(<f-args>)
 endif
 
+if !exists(":TsepepeGoToCorrespondingFile")
+    command -buffer -nargs=0 TsepepeGoToCorrespondingFile :call GoToCorrespondingFile()
+endif
+
 if !has("python3")
     throw "ERROR: no python3 support! Enable +python3 feature to allow this plugin to work."
 endif
@@ -69,6 +73,25 @@ if !exists("*s:ImplementInterface")
         var new_file_content = GetFileContentAfterImplementingInterface(
             interface_name)
         ReplaceActiveBufferContent(new_file_content)
+    enddef
+endif
+
+if !exists("*s:GoToCorrespondingFile")
+    # Activates window with the corresponding source file. For a header file 
+    # it will ba a source file, and for a source file it will be a header
+    # file. The corresponding file is a paired C++ file, which has the same
+    # stem.
+    def GoToCorrespondingFile()
+        var corresponding_file = ''
+        var paired_cpp_files = FindPairedCppFile()
+        if paired_cpp_files->len() == 1
+            corresponding_file = paired_cpp_files[0]
+        else
+            corresponding_file = QueryUser(
+                'Found multiple paired files. Which one to switch to?', 
+                paired_cpp_files)
+        endif
+        ActivateFile(corresponding_file)
     enddef
 endif
 
@@ -145,10 +168,8 @@ endif
 
 if !exists("*s:AppendToWindow")
     def AppendToWindow(file: string, text: string)
-        # Open the definition file in another window, or go to already
-        # existing window with that file open.
-        execute('tab drop ' .. file)
-        
+        ActivateFile(file)
+
         # Put the cursor at the end of file.
         execute('normal! G$')
     
@@ -209,5 +230,13 @@ if !exists("*ReplaceActiveBufferContent")
 
         # Restore the cursor
         setpos('.', save_cursor)
+    enddef
+endif
+
+if !exists("*s:ActivateFile")
+    # Open the definition file in another window, or go to already
+    # existing window with that file open.
+    def ActivateFile(file: string)
+        execute('tab drop ' .. file)
     enddef
 endif
