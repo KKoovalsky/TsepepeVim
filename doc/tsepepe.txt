@@ -50,6 +50,37 @@ root directory of the project.
                         open in a vim window, then the window is reused. 
                         Otherwise, a new window is open.
 
+-------------------------------------------------------------------------------
+:TsepepeImplIface {interfacename}                          *:TsepepeImplIface*
+
+    Extends the class/struct under the cursor with the specified
+    {interfacename}. The {interfacename} shall be the name specifed after the
+    "struct" or "class" keyword; it shall not be the qualified name, which
+    contains the scopes where the class/struct is located.
+
+    The cursor position must be at any place of the class/struct definition.
+    In case no class under cursor is found, then an error will be raised.
+
+    After validating that the cursor is within a class, the codebase is
+    searched for the interface with the {interfacename}. (By an interface an
+    abstract class with pure virtual functions is considered.) When such an
+    interface is found then:
+
+        * Corresponding include will be added, if not already in place. The
+        include path will simply be the filename containing the interface. The
+        support for resolving the path for the include statement is not yet 
+        supported, thus, this tool doesn't guarantee the path to the inlude is 
+        valid (code may not compile).
+
+        * The base-clause will be created (if empty), or extended, with
+        the interface name and "public" access specifier.
+    
+        * All the pure virtual functions will be collected and put into the
+        class body, below the first chain of public methods, or at the 
+        beginning of the first "public" section within the class, if no public 
+        method is found. In case there is no "public" section exists, such a
+        section will be added.
+
 ==============================================================================
 2. Per-project configuration                          *tsepepe-project-config*
 
