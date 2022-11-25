@@ -87,7 +87,7 @@ if !exists("*s:GoToCorrespondingFile")
         if paired_cpp_files->len() == 1
             corresponding_file = paired_cpp_files[0]
         else
-            corresponding_file = QueryUser(
+            corresponding_file = QueryUserForProjectFile(
                 'Found multiple paired files. Which one to switch to?', 
                 paired_cpp_files)
         endif
@@ -145,7 +145,7 @@ if !exists("*FindDefinitionFile")
             if paired_cpp_files->len() == 1
                 definition_file = paired_cpp_files[0]
             else
-                definition_file = QueryUser(
+                definition_file = QueryUserForProjectFile(
                     'Where to put the definition?', paired_cpp_files)
             endif
         endif
@@ -153,15 +153,27 @@ if !exists("*FindDefinitionFile")
     enddef
 endif
 
-if !exists("*QueryUser")
-    def QueryUser(prompt: string, choices: list<string>): string
+if !exists("*s:QueryUserForProjectFile")
+    def QueryUserForProjectFile(prompt: string, choices: list<string>): string
         var choices_adapted: list<string>
         var ordinal_num = 1
+        var root_dir = getcwd()
+        var root_dir_match = '^' .. root_dir
+        var root_dir_str_len = strlen(root_dir)
         for choice in choices
-            choices_adapted->add("&" .. ordinal_num .. ". " .. choice .. "\n")
+            var choice_to_print = ''
+            if choice =~ root_dir_match
+                choice_to_print = slice(choice, root_dir_str_len)
+                if choice_to_print[0] == '/'
+                    choice_to_print = slice(choice_to_print, 1)
+                endif
+            else
+                choice_to_print = choice
+            endif
+            choices_adapted->add("&" .. ordinal_num .. ". " .. choice_to_print)
             ++ordinal_num
         endfor
-        var actual_choice = confirm(prompt, choices_adapted->join(''))
+        var actual_choice = confirm(prompt, choices_adapted->join("\n"))
         return choices->get(actual_choice - 1)
     enddef
 endif
