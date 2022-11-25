@@ -202,7 +202,7 @@ if !exists("*ReplaceActiveBufferContent")
         var save_cursor = getcurpos()
 
         # Delete all the lines from the active buffer (make the buffer empty).
-        deletebufline('.', 1, '$')
+        deletebufline('%', 1, '$')
 
         # Set the buffer content with the new lines.
         setline(1, split(new_buffer_content, '\n'))
