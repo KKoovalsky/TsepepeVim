@@ -76,7 +76,6 @@ behave compile_command_database_directory_path_getter/
 
 ## TODO
 
-* Implement interface / Implement abstract class
 * Generate multiple function definitions using visual line mode.
 * Generate declaration from a definition, or a function call (invocation).
 * Update function definition / declaration.
