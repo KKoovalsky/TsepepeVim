@@ -12,7 +12,7 @@ endif
 b:did_ftplugin = 1
 
 if !exists(":TsepepeGenDef")
-    command -buffer -nargs=0 -range TsepepeGenDef :call GenerateFunctionDefinitionssInProperCppFile()
+    command -buffer -nargs=0 -range TsepepeGenDef :call GenerateFunctionDefinitionssInProperCppFile(<line1>, <line2>)
 endif
 
 if !exists(":TsepepeImplIface")
@@ -59,9 +59,10 @@ if !exists("g:tsepepe_programs_dir")
 endif
 
 if !exists("*s:GenerateFunctionDefinitionssInProperCppFile")
-    def GenerateFunctionDefinitionssInProperCppFile()
+    def GenerateFunctionDefinitionssInProperCppFile(
+            line_begin: number, line_end: number)
         var definition_file = FindDefinitionFile()
-        var definitions = GenerateFunctionDefinitions()
+        var definitions = GenerateFunctionDefinitions(line_begin, line_end)
         AppendToWindow(definition_file, definitions)
     enddef
 endif
@@ -98,11 +99,11 @@ endif
 if !exists("*GenerateFunctionDefinitions")
     # Generates function definition from a declaration found at line, where
     # the cursor is currently located.
-    def GenerateFunctionDefinitions(): string
+    def GenerateFunctionDefinitions(
+            line_begin: number, line_end: number): string
         var dir_with_compile_db = FindCompilationDatabaseDirectory()
         var current_file_abs_path = expand('%:p')
         var current_buffer_content = join(getline(1, '$'), "\n")
-        var active_range = GetActiveLineRange()
         var generator = g:tsepepe_programs_dir
             .. '/tsepepe_function_definition_generator'
         return RunShellCommandAndGetStdout("GenerateFunctionDefinitions", 
@@ -110,23 +111,10 @@ if !exists("*GenerateFunctionDefinitions")
              dir_with_compile_db,
              current_file_abs_path,
              current_buffer_content,
-             active_range[0],
-             active_range[1]
+             line_begin,
+             line_end
             ]
          )
-    enddef
-endif
-
-if !exists("*s:GetActiveLineRange")
-    def GetActiveLineRange(): list<number>
-        var visual_area_start = line("'<")
-        if visual_area_start != 0
-            var visual_area_end = line("'>")
-            return [visual_area_start, visual_area_end]
-        else
-            var current_active_line = line('.')
-            return [current_active_line, current_active_line]
-        endif
     enddef
 endif
 
