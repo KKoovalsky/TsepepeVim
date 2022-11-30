@@ -285,7 +285,6 @@ if !exists("*s:RunShellCommandAndGetStdout")
                   " and stderr:\n" .. join(stderr, "\n")
         endif
  
-        echo stdout   
         if !empty(stderr)
             echom "Command: " .. id_ " didn't fail, but stderr is not empty:\n" .. join(stderr, "\n")
         endif
