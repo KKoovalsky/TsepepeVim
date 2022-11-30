@@ -12,7 +12,7 @@ endif
 b:did_ftplugin = 1
 
 if !exists(":TsepepeGenDef")
-    command -buffer -nargs=0 TsepepeGenDef :call GenerateFunctionDefinitionInProperCppFile()
+    command -buffer -nargs=0 -range TsepepeGenDef :call GenerateFunctionDefinitionssInProperCppFile()
 endif
 
 if !exists(":TsepepeImplIface")
@@ -58,11 +58,11 @@ if !exists("g:tsepepe_programs_dir")
     g:tsepepe_programs_dir = g:tsepepe_plugin_dir .. '/output/bin'
 endif
 
-if !exists("*s:GenerateFunctionDefinitionInProperCppFile")
-    def GenerateFunctionDefinitionInProperCppFile()
+if !exists("*s:GenerateFunctionDefinitionssInProperCppFile")
+    def GenerateFunctionDefinitionssInProperCppFile()
         var definition_file = FindDefinitionFile()
-        var definition = GenerateFunctionDefinition()
-        AppendToWindow(definition_file, definition)
+        var definitions = GenerateFunctionDefinitions()
+        AppendToWindow(definition_file, definitions)
     enddef
 endif
 
@@ -95,24 +95,40 @@ if !exists("*s:GoToCorrespondingFile")
     enddef
 endif
 
-if !exists("*GenerateFunctionDefinition")
+if !exists("*GenerateFunctionDefinitions")
     # Generates function definition from a declaration found at line, where
     # the cursor is currently located.
-    def GenerateFunctionDefinition(): string
+    def GenerateFunctionDefinitions(): string
         var dir_with_compile_db = FindCompilationDatabaseDirectory()
         var current_file_abs_path = expand('%:p')
-        var current_active_line = line('.')
+        var current_buffer_content = join(getline(1, '$'), "\n")
+        var active_range = GetActiveLineRange()
         var generator = g:tsepepe_programs_dir
             .. '/tsepepe_function_definition_generator'
         var cmd = generator .. ' '
             .. dir_with_compile_db .. ' '
             .. current_file_abs_path .. ' '
-            .. current_active_line
+            .. shellescape(current_buffer_content) .. ' '
+            .. active_range[0] .. ' '
+            .. active_range[1]
         var result = system(cmd)
         if v:shell_error != 0
             throw result
         endif
         return result
+    enddef
+endif
+
+if !exists("*s:GetActiveLineRange")
+    def GetActiveLineRange(): list<number>
+        var visual_area_start = line("'<")
+        if visual_area_start != 0
+            var visual_area_end = line("'>")
+            return [visual_area_start, visual_area_end]
+        else
+            var current_active_line = line('.')
+            return [current_active_line, current_active_line]
+        endif
     enddef
 endif
 
@@ -186,7 +202,7 @@ if !exists("*s:AppendToWindow")
         execute('normal! G$')
     
         # Put the text under the cursor.
-        execute("normal! a\n\n" .. text .. "\n{\n}\<ESC>")
+        execute("normal! a\n\n" .. text .. "\<ESC>")
     enddef
 endif
 
