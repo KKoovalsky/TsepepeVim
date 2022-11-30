@@ -210,23 +210,16 @@ if !exists("*GetFileContentAfterImplementingInterface")
         var current_file_abs_path = expand('%:p')
         var current_buffer_content = join(getline(1, '$'), "\n")
         var active_line = line('.')
-
         var implementor_maker = g:tsepepe_programs_dir 
             .. '/tsepepe_implementor_maker'
-        var cmd = implementor_maker .. ' '
-            .. dir_with_compile_db .. ' '
-            .. project_root .. ' '
-            .. current_file_abs_path .. ' '
-            .. shellescape(current_buffer_content) .. ' '
-            .. interface_name .. ' '
-            .. active_line
-
-        var result = system(cmd)
-        if v:shell_error != 0
-            throw result
-        endif
-
-        return result
+        var cmd = [implementor_maker, 
+            dir_with_compile_db,
+            project_root,
+            current_file_abs_path,
+            current_buffer_content,
+            interface_name,
+            active_line]
+        return RunShellCommandAndGetStdout("ImplementorMaker", cmd)
     enddef
 endif
 
