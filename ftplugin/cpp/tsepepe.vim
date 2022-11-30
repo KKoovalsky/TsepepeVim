@@ -105,17 +105,15 @@ if !exists("*GenerateFunctionDefinitions")
         var active_range = GetActiveLineRange()
         var generator = g:tsepepe_programs_dir
             .. '/tsepepe_function_definition_generator'
-        var cmd = generator .. ' '
-            .. dir_with_compile_db .. ' '
-            .. current_file_abs_path .. ' '
-            .. shellescape(current_buffer_content) .. ' '
-            .. active_range[0] .. ' '
-            .. active_range[1]
-        var result = system(cmd)
-        if v:shell_error != 0
-            throw result
-        endif
-        return result
+        return RunShellCommandAndGetStdout("GenerateFunctionDefinitions", 
+            [generator,
+             dir_with_compile_db,
+             current_file_abs_path,
+             current_buffer_content,
+             active_range[0],
+             active_range[1]
+            ]
+         )
     enddef
 endif
 
@@ -268,3 +266,42 @@ if !exists("*s:ActivateFile")
         execute('tab drop ' .. file)
     enddef
 endif
+
+if !exists("*s:RunShellCommandAndGetStdout")
+    def RunShellCommandAndGetStdout(id_: string, cmd: list<any>): string
+        var stdout: list<string>
+        var stderr: list<string>
+
+        def on_stdout(ch: channel, msg: string)
+            add(stdout, msg)
+        enddef
+        def on_stderr(ch: channel, msg: string)
+            add(stderr, msg)
+        enddef
+
+        var job = job_start(cmd, {out_cb: on_stdout, err_cb: on_stderr})
+        var status = "run"
+        while status == "run"
+            status = job_status(job)
+            sleep 1m
+        endwhile
+
+        if status == "fail"
+            throw "Command: " .. id_ .. " failed to run!"
+        endif
+
+        var result_code = job_info(job)['exitval']
+        if result_code != 0
+            throw "Command: " .. id_ .. 
+                  " failed with return code: " .. result_code .. 
+                  " and stderr:\n" .. join(stderr, "\n")
+        endif
+ 
+        echo stdout   
+        if !empty(stderr)
+            echom "Command: " .. id_ " didn't fail, but stderr is not empty:\n" .. join(stderr, "\n")
+        endif
+        return join(stdout, "\n")
+    enddef
+endif
+
