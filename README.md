@@ -2,7 +2,8 @@
 
 This is a tiny C++ refactoring plugin which currently supports:
 
-* function definition generation from a function declaration,
+* function definition generation from a function declaration (works as well for multiple declarations using the visual 
+mode),
 * implementing an interface (extending a class with an abstract class)
 * switching to the corresponding (paired) C++ file, with the same stem
 
@@ -21,14 +22,21 @@ experience while explicitly invoking the plugin's commands.
 - Finds corresponding (paired) C++ file and appends the definition to it.
 - Takes into account all the specifiers, attributes, default parameters, namespaces, nested classes, nested types, etc.
 Knows what to skip and what to keep.
+- Handles generation of multiple function definitions from a visual selection.
 
 ![Tsepepe Function definition generator presentation](./doc/assets/tsepepe_gen_def_presentation.gif)
+
+More sophisticated example: using visual selection to generate multiple definitions:
+
+![Tsepepe Multiple function definitions generation presentation](doc/assets/tsepepe_gen_def_multiple_presentation.gif)
 
 ### Implement interface
 
 - Finds the interface (abstract class) with the specifed name within the project.
 - Adds an include statement, if not yet present, extends the base-clause with the qualified name of the interface,
 and adds `override` declarations of the pure virtual methods.
+- Handles compound interfaces (interfaces which are created by inheritance from other interfaces).
+- Resolves all the types properly, so the code shall be compilable.
 
 ![Tsepepe Implement interface presentation](./doc/assets/tsepepe_impl_iface_presentation.gif)
 
