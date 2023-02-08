@@ -253,14 +253,14 @@ if !exists("*s:RunShellCommandAndGetStdout")
         var stdout: list<string>
         var stderr: list<string>
 
-        def on_stdout(ch: channel, msg: string)
+        def On_stdout(ch: channel, msg: string)
             add(stdout, msg)
         enddef
-        def on_stderr(ch: channel, msg: string)
+        def On_stderr(ch: channel, msg: string)
             add(stderr, msg)
         enddef
 
-        var job = job_start(cmd, {out_cb: on_stdout, err_cb: on_stderr})
+        var job = job_start(cmd, {out_cb: On_stdout, err_cb: On_stderr})
         var status = "run"
         while status == "run"
             status = job_status(job)
