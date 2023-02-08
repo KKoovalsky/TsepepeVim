@@ -50,7 +50,7 @@ System-wide:
 
 * GCC 12.1.0+
 * CMake 3.22
-* `libclang-14-dev` and `libllvm-14-dev`
+* `libclang-14-dev`+ and `libllvm-14-dev`+
 * `libboost-1.74`+
 * `ripgrep`
 
