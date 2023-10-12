@@ -21,8 +21,8 @@ def run(command: str):
     if cmd_result.returncode != 0:
         eprint("Failed executing command: {}".format(command))
         print(cmd_result.stdout)
-        eprint(cmd_result.stderr, file=sys.stderr)
-        exit(cmd.returncode)
+        eprint(cmd_result.stderr)
+        exit(cmd_result.returncode)
 
 
 def eprint(*args, **kwargs):
